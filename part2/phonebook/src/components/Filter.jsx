@@ -1,8 +1,8 @@
-const Filter = ({ value, onChange }) => {
+const Filter = ({ searchTerm, onSearchChange }) => {
   return (
     <div>
       <label>Search contacts: </label>
-      <input value={value} onChange={onChange} />
+      <input value={searchTerm} onChange={onSearchChange} />
     </div>
   );
 };

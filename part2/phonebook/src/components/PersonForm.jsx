@@ -1,23 +1,33 @@
 const PersonForm = ({
-  handeSubmit,
   newName,
-  newNumber,
-  handleNameChange,
-  handleNumberChange,
+  newPhone,
+  onNameChange,
+  onPhoneChange,
+  onSubmit,
 }) => {
   return (
-    <form onSubmit={handeSubmit}>
-      <div>
-        <label>Name: </label>
-        <input type="text" value={newName} onChange={handleNameChange} />
+    <form onSubmit={onSubmit} className="person-form">
+      <div className="form-group">
+        <label className="form-label">Name:</label>
+        <input
+          type="text"
+          value={newName}
+          onChange={onNameChange}
+          className="form-input"
+        />
       </div>
-      <div>
-        <label>Number: </label>
-        <input type="text" value={newNumber} onChange={handleNumberChange} />
+      <div className="form-group">
+        <label className="form-label">Phone:</label>
+        <input
+          type="tel"
+          value={newPhone}
+          onChange={onPhoneChange}
+          className="form-input"
+        />
       </div>
-      <div>
-        <button type="submit">Add contact</button>
-      </div>
+      <button type="submit" className="submit-button">
+        Add Contact
+      </button>
     </form>
   );
 };
