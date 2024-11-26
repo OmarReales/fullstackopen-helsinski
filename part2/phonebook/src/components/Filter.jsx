@@ -1,8 +1,13 @@
 const Filter = ({ searchTerm, onSearchChange }) => {
   return (
-    <div>
-      <label>Search contacts: </label>
-      <input value={searchTerm} onChange={onSearchChange} />
+    <div className="search-filter">
+      <input
+        type="text"
+        placeholder="Search contacts..."
+        value={searchTerm}
+        onChange={onSearchChange}
+        className="search-input"
+      />
     </div>
   );
 };

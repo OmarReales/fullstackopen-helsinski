@@ -3,6 +3,13 @@ import Filter from "./components/Filter";
 import PersonForm from "./components/PersonForm";
 import PersonList from "./components/PersonList";
 import personService from "./services/persons";
+import Notification from "./components/Notification";
+import { formatErrorMessage } from "./utils/errorHandler";
+import {
+  handlePersonRemoval,
+  handlePersonUpdate,
+  findPerson,
+} from "./utils/stateManager";
 
 const App = () => {
   const [persons, setPersons] = useState([]);
@@ -18,8 +25,7 @@ const App = () => {
         setPersons(initialPersons);
       })
       .catch((error) => {
-        showMessage("Error loading contacts", "error");
-        console.error(error);
+        showMessage("Error loading contacts: " + error.message, "error");
       });
   }, []);
 
@@ -30,7 +36,7 @@ const App = () => {
     }, 5000);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!newName.trim() || !newPhone.trim()) {
@@ -38,9 +44,7 @@ const App = () => {
       return;
     }
 
-    const existingPerson = persons.find(
-      (person) => person.name.toLowerCase() === newName.toLowerCase()
-    );
+    const existingPerson = findPerson(persons, newName);
 
     if (existingPerson) {
       if (
@@ -49,22 +53,25 @@ const App = () => {
         )
       ) {
         const updatedPerson = { ...existingPerson, number: newPhone };
-        personService
-          .update(existingPerson.id, updatedPerson)
-          .then((returnedPerson) => {
-            setPersons(
-              persons.map((person) =>
-                person.id === existingPerson.id ? returnedPerson : person
-              )
-            );
-            setNewName("");
-            setNewPhone("");
-            showMessage(`Updated ${returnedPerson.name}'s number`);
-          })
-          .catch((error) => {
-            showMessage(`Error updating ${newName}'s number`, "error");
-            console.error(error);
-          });
+        try {
+          const returnedPerson = await personService.update(
+            existingPerson.id,
+            updatedPerson
+          );
+          setPersons(handlePersonUpdate(persons, returnedPerson));
+          setNewName("");
+          setNewPhone("");
+          showMessage(`Updated ${returnedPerson.name}'s number`);
+        } catch (error) {
+          const errorMessage = formatErrorMessage("updating", newName, error);
+          showMessage(errorMessage, "error");
+          if (
+            error.name === "NotFoundError" ||
+            error.response?.status === 404
+          ) {
+            setPersons(handlePersonRemoval(persons, existingPerson.id));
+          }
+        }
       }
       return;
     }
@@ -74,32 +81,30 @@ const App = () => {
       number: newPhone,
     };
 
-    personService
-      .create(newPerson)
-      .then((returnedPerson) => {
-        setPersons([...persons, returnedPerson]);
-        setNewName("");
-        setNewPhone("");
-        showMessage(`Added ${returnedPerson.name}`);
-      })
-      .catch((error) => {
-        showMessage("Error adding contact", "error");
-        console.error(error);
-      });
+    try {
+      const returnedPerson = await personService.create(newPerson);
+      setPersons([...persons, returnedPerson]);
+      setNewName("");
+      setNewPhone("");
+      showMessage(`Added ${returnedPerson.name}`);
+    } catch (error) {
+      showMessage(formatErrorMessage("adding", newName, error), "error");
+    }
   };
 
-  const handleDelete = (id, name) => {
+  const handleDelete = async (id, name) => {
     if (window.confirm(`Delete ${name}?`)) {
-      personService
-        .remove(id)
-        .then(() => {
-          setPersons(persons.filter((person) => person.id !== id));
-          showMessage(`Deleted ${name}`);
-        })
-        .catch((error) => {
-          showMessage(`Error deleting ${name}`, "error");
-          console.error(error);
-        });
+      try {
+        await personService.remove(id);
+        setPersons(handlePersonRemoval(persons, id));
+        showMessage(`Deleted ${name}`);
+      } catch (error) {
+        const errorMessage = formatErrorMessage("deleting", name, error);
+        showMessage(errorMessage, "error");
+        if (error.response?.status === 404) {
+          setPersons(handlePersonRemoval(persons, id));
+        }
+      }
     }
   };
 
@@ -111,9 +116,7 @@ const App = () => {
     <div className="container">
       <h1>Phonebook</h1>
 
-      {message && (
-        <div className={`message ${message.type}`}>{message.text}</div>
-      )}
+      <Notification message={message} />
 
       <Filter
         searchTerm={searchTerm}
