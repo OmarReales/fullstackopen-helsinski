@@ -1,0 +1,82 @@
+.app {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.search-container {
+  margin-bottom: 20px;
+}
+
+.search-container input {
+  margin-left: 10px;
+  padding: 5px;
+  font-size: 16px;
+  width: 200px;
+}
+
+.country-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.country-item {
+  padding: 10px;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.show-button {
+  padding: 4px 8px;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.show-button:hover {
+  background-color: #45a049;
+}
+
+.country-detail {
+  padding: 20px;
+  background-color: #f5f5f5;
+  border-radius: 8px;
+}
+
+.country-info {
+  margin: 15px 0;
+}
+
+.languages ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.languages li {
+  margin: 5px 0;
+}
+
+.flag img {
+  max-width: 300px;
+  margin-top: 20px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+.weather {
+  margin-top: 20px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+}
+
+.weather img {
+  width: 50px;
+  height: 50px;
+}

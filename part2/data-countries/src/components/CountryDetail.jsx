@@ -1,4 +1,19 @@
+import { useEffect, useState } from "react";
+import { getWeatherByCoordinates } from "../services/countryServices";
+
 const CountryDetail = ({ country }) => {
+  const [weather, setWeather] = useState(null);
+
+  useEffect(() => {
+    const fetchWeather = async () => {
+      if (country.capitalInfo?.latlng) {
+        const [lat, lon] = country.capitalInfo.latlng;
+        const weatherData = await getWeatherByCoordinates(lat, lon);
+        setWeather(weatherData);
+      }
+    };
+    fetchWeather();
+  }, [country]);
   return (
     <div className="country-detail">
       <h2>{country.name.common}</h2>
@@ -19,6 +34,17 @@ const CountryDetail = ({ country }) => {
       <div className="flag">
         <img src={country.flags.png} alt={country.name.common} />
       </div>
+      {weather ? (
+        <div className="weather">
+          <h3>Weather in {country.capital}</h3>
+          <p>Temperature: {weather.temperature}°C</p>
+          <img src={weather.icon} alt={weather.condition} />
+          <p>Condition: {weather.condition}</p>
+          <img src={weather.icon} alt={weather.condition} />
+        </div>
+      ) : (
+        <p>Loading weather...</p>
+      )}
     </div>
   );
 };

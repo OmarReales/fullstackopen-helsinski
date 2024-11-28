@@ -3,6 +3,7 @@ import Filter from "./components/Filter";
 import CountriesList from "./components/CountriesList";
 import CountryDetail from "./components/CountryDetail";
 import { searchCountries } from "./services/countryServices";
+import "./App.css";
 
 const App = () => {
   const [countries, setCountries] = useState([]);
